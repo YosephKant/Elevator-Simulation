@@ -43,15 +43,36 @@ class Elevator
 		end
 	end
 
+	def get_nearest_floor flrs#gets the nearest floor with a button pressed
+		positions=[]
+		flrs.each do |floor|
+			positions.push((floor.position-@position).abs)
+		end
+		min=100
+		i=-1
+		(0..positions.size-1).each do |x|
+			if positions[x]<min 
+				min=positions[x]
+				i=x
+			end
+		end
+		return flrs[i].position
+	end
+
+
 	def calc_destination#calculates destination based on @destination_queue
 		if @destination_queue.empty?#if destination queue is empty sets destination to first floor with a pressed button
+			floors_with_button_pressed=[]
 			@floors.each do |floor|
 				if floor.button!=nil
-					@destination=floor.position
-					return
+					floors_with_button_pressed.push(floor)
 				end
 			end
-			@destination=nil #if no buttons are pressed returns to bottom floor
+			if floors_with_button_pressed.empty?
+				@destination=nil #if no buttons are pressed returns to bottom floor
+			else
+				@destination=get_nearest_floor(floors_with_button_pressed)
+			end
 		else
 			@destination=@destination_queue.shift
 		end
